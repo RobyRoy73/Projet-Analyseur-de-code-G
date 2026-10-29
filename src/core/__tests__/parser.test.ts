@@ -86,7 +86,7 @@ describe('parseGCode : alertes', () => {
     const r = parseGCode(sample('plaque-support-2-faces.txt'));
     const msgs = r.alerts.map((a) => a.message).join('\n');
     expect(msgs).toMatch(/Plongée en rapide G0 sous Z0/);
-    expect(msgs).toMatch(/X820 hors de la course machine/);
+    expect(msgs).toMatch(/Étendue en X de 820 mm : dépasse la course machine de 800 mm/);
     expect(msgs).toMatch(/Code G65 inconnu/);
     expect(msgs).toMatch(/F1200 hérité/);
   });
@@ -98,9 +98,28 @@ describe('parseGCode : alertes', () => {
     );
   });
 
+  it('accepte des coordonnées négatives tant que l’étendue tient dans la course', () => {
+    const r = parseGCode('G0 X-15 Y-10\nG1 X100 F1000\nM30');
+    expect(r.alerts.some((a) => /course/.test(a.message))).toBe(false);
+  });
+
+  it('ne signale le dépassement de course qu’une fois par axe', () => {
+    const r = parseGCode('G0 X0\nG0 X900\nG0 X950\nM30');
+    expect(r.alerts.filter((a) => /course/.test(a.message))).toHaveLength(1);
+  });
+
   it('signale un rapide XY dans la matière', () => {
     const r = parseGCode('G1 Z-2 F100\nG0 X10\nM30');
     expect(r.alerts.some((a) => /rapide XY/.test(a.message))).toBe(true);
+  });
+});
+
+describe('parseGCode : programme de test de 400 lignes', () => {
+  it('trouve exactement les 5 erreurs volontaires', () => {
+    const r = parseGCode(sample('test-boitier-400-lignes.txt'));
+    expect(r.alerts.map((a) => a.line)).toEqual([178, 233, 379, 394, 395]);
+    expect(r.faces.map((f) => f.name)).toEqual(['Face A', 'Face B']);
+    expect(r.tools.map((t) => t.type)).toEqual(['Fraise', 'Fraise', 'Foret', 'Surfaceuse', 'Graveur', 'Palpeur']);
   });
 });
 

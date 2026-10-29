@@ -134,11 +134,21 @@ export function parseGCode(text: string, settings: Settings = DEFAULT_SETTINGS):
     if (k === 'toolChange') f.toolChanges++;
   };
 
+  /**
+   * Les coordonnées sont relatives à l'origine pièce (G54…), dont la position dans la machine est inconnue.
+   * On vérifie donc l'étendue parcourue sur chaque axe par rapport à la course : une seule alerte par axe,
+   * à la première ligne où l'étendue dépasse la course.
+   */
+  const reach = { x: [Infinity, -Infinity], y: [Infinity, -Infinity], z: [Infinity, -Infinity] } as Record<'x' | 'y' | 'z', [number, number]>;
+  const overflowed = new Set<string>();
   const checkBounds = (line: number, p: Point3) => {
     (['x', 'y', 'z'] as const).forEach((a) => {
-      const [lo, hi] = machine[a];
-      if (p[a] < lo - 1e-6 || p[a] > hi + 1e-6) {
-        alert('err', line, `${a.toUpperCase()}${round3(p[a])} hors de la course machine (${lo} à ${hi} mm)`);
+      const r = reach[a];
+      r[0] = Math.min(r[0], p[a]); r[1] = Math.max(r[1], p[a]);
+      const span = machine[a][1] - machine[a][0];
+      if (!overflowed.has(a) && r[1] - r[0] > span + 1e-6) {
+        overflowed.add(a);
+        alert('err', line, `Étendue en ${a.toUpperCase()} de ${round3(r[1] - r[0])} mm : dépasse la course machine de ${round3(span)} mm (${a.toUpperCase()}${round3(p[a])})`);
       }
     });
   };
@@ -231,6 +241,7 @@ export function parseGCode(text: string, settings: Settings = DEFAULT_SETTINGS):
         }
       }
     }
+    checkBounds(line, from);
     checkBounds(line, to);
     points.forEach((p) => (['x', 'y', 'z'] as const).forEach((a) => { min[a] = Math.min(min[a], p[a]); max[a] = Math.max(max[a], p[a]); }));
     segments.push({ line, kind, motion, points, from, to, feed: st.feed, tool: st.tool, face: currentFace().key, length, time });
