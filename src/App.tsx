@@ -145,6 +145,9 @@ export default function App() {
 
       <div className="foot">
         <span>Temps estimés sans accélérations machine. Les vitesses proposées sont des points de départ à valider avec le fabricant d'outils.</span>
+        {location.protocol === 'file:'
+          ? <span>Version hors ligne : aucune connexion Internet utilisée.</span>
+          : <a className="btn ghost" href="./analyseur-code-g-hors-ligne.html" download>Télécharger la version hors ligne</a>}
       </div>
       {toast && <div className="toast" role="status">{toast}</div>}
     </div>

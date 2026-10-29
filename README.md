@@ -22,6 +22,16 @@ Contrôleurs pris en charge : **GRBL**, **Fanuc**, **LinuxCNC** (codes reconnus 
 Cycles de perçage `G73`, `G81` à `G89` simulés (rapide à R, avance à Z, retour G98/G99).
 Fichiers en pouces (`G20`) convertis en mm.
 
+## Utilisation hors ligne (programmes confidentiels)
+
+Le site ne transmet jamais les programmes : ils sont lus dans le navigateur. Pour travailler sans aucune connexion :
+
+1. Sur le site, cliquer sur **Télécharger la version hors ligne** (bas de page).
+2. Enregistrer `analyseur-code-g-hors-ligne.html` sur l'ordinateur.
+3. L'ouvrir d'un double-clic, même sans Internet. Le fichier contient toute l'application et n'utilise aucune ressource externe.
+
+Pour une nouvelle version, télécharger de nouveau le fichier. `npm run build` le produit aussi dans `dist/`.
+
 ## Installation
 
 Prérequis : [Node.js](https://nodejs.org) 20 ou plus récent.
