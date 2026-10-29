@@ -13,11 +13,13 @@ import { downloadText, usePersistentState } from './hooks/usePersistentState';
 import sample1 from '../samples/plaque-support-2-faces.txt?raw';
 import sample2 from '../samples/sans-commentaires-g54-g55.txt?raw';
 import sample3 from '../samples/fanuc-cycle-percage.txt?raw';
+import sample4 from '../samples/test-boitier-400-lignes.txt?raw';
 
 const SAMPLES = [
   { name: 'plaque-support-2-faces.txt', text: sample1, label: 'Exemple : plaque 2 faces (GRBL)' },
   { name: 'sans-commentaires-g54-g55.txt', text: sample2, label: 'Exemple : 2 origines G54/G55' },
   { name: 'fanuc-cycle-percage.txt', text: sample3, label: 'Exemple : cycles de perçage (Fanuc)' },
+  { name: 'test-boitier-400-lignes.txt', text: sample4, label: 'Test : boîtier 400 lignes, 5 erreurs' },
 ];
 const ACCEPT = '.txt,.nc,.gcode,.ngc,.tap,.cnc,.eia,.iso';
 const baseName = (f: string) => f.replace(/\.[^.]+$/, '');
